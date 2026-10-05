@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🎃 Caja Mediana Misteriosa de Halloween 🦇</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle, #2e1065 0%, #09090b 100%);
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            user-select: none;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .contenedor-principal {
+            background: rgba(15, 23, 42, 0.9);
+            border: 3px solid #7c3aed;
+            border-radius: 24px;
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.5), inset 0 0 15px rgba(245, 158, 11, 0.2);
+            position: relative;
+        }
+
+        h1 {
+            font-size: 19px;
+            color: #f59e0b;
+            margin-top: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .subtitulo {
+            font-size: 11px;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+        }
+
+        /* CAJA DE HALLOWEEN */
+        .caja-contenedor {
+            font-size: 75px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: transform 0.15s ease, filter 0.15s ease;
+            filter: drop-shadow(0 0 10px #f59e0b);
+            animation: flotar 3s ease-in-out infinite;
+        }
+
+        .caja-contenedor.bloqueada {
+            cursor: not-allowed;
+            animation: none;
+            filter: grayscale(0.5) brightness(0.7);
+        }
+
+        .caja-contenedor:active:not(.bloqueada) {
+            transform: scale(0.9) rotate(-5deg);
+        }
+
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .estado-texto {
+            font-size: 13px;
+            font-weight: bold;
+            color: #a78bfa;
+            margin-bottom: 12px;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* CONTADOR DE TOQUES (Sello + 8 Premios) */
+        .progreso-toques {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .punto-toque {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 2px solid #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #64748b;
+            font-weight: bold;
+        }
+
+        .punto-toque.activo {
+            background: #7c3aed;
+            border-color: #c084fc;
+            color: white;
+            box-shadow: 0 0 6px #a855f7;
+        }
+
+        .punto-toque.completado {
+            background: #059669;
+            border-color: #34d399;
+            color: white;
+        }
+
+        /* HISTORIAL DE PREMIOS EN VIVO */
+        .seccion-premios {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 12px;
+            padding: 8px;
+            text-align: left;
+            max-height: 130px;
+            overflow-y: auto;
+            border: 1px solid #334155;
+        }
+
+        .seccion-premios h3 {
+            font-size: 11px;
+            color: #38bdf8;
+            margin: 0 0 4px 0;
+            text-align: center;
+        }
+
+        .lista-premios {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 11px;
+        }
+
+        .lista-premios li {
+            padding: 4px 6px;
+            margin-bottom: 3px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 6px;
+            border-left: 3px solid #f59e0b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* MODAL DE RESUMEN FINAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .modal-contenido {
+            background: #1e293b;
+            border: 3px solid #f59e0b;
+            border-radius: 20px;
+            padding: 15px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            animation: aparecerModal 0.3s ease-out;
+        }
+        @keyframes aparecerModal {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .oculto { display: none !important; }
+
+        .btn-accion {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 12px;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
+            width: 100%;
+        }
+
+        .btn-borrar {
+            background: transparent;
+            color: #ef4444;
+            border: 1px dashed #ef4444;
+            padding: 5px;
+            font-size: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        /* DECORACIONES FONDO */
+        .decoracion-fondo {
+            position: fixed;
+            font-size: 24px;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="decoracion-fondo" style="top: 10%; left: 10%;">🦇</div>
+    <div class="decoracion-fondo" style="top: 15%; right: 15%;">🎃</div>
+    <div class="decoracion-fondo" style="bottom: 12%; left: 15%;">👻</div>
+    <div class="decoracion-fondo" style="bottom: 20%; right: 10%;">🕷️</div>
+
+    <div class="contenedor-principal">
+        <h1>🎃 Caja Mediana de Halloween 🦇</h1>
+        <div class="subtitulo">¡Un sello embrujado protege 8 valiosos tesoros!</div>
+
+        <!-- Indicador: Sello (0) + 8 Premios (1 al 8) -->
+        <div class="progreso-toques" id="indicadores">
+            <div class="punto-toque" id="p-0" title="Sello">🔒</div>
+            <div class="punto-toque" id="p-1">1</div>
+            <div class="punto-toque" id="p-2">2</div>
+            <div class="punto-toque" id="p-3">3</div>
+            <div class="punto-toque" id="p-4">4</div>
+            <div class="punto-toque" id="p-5">5</div>
+            <div class="punto-toque" id="p-6">6</div>
+            <div class="punto-toque" id="p-7">7</div>
+            <div class="punto-toque" id="p-8">8</div>
+        </div>
+
+        <!-- Elemento de la caja -->
+        <div class="caja-contenedor" id="caja-magica" onclick="tocarCaja()">📦</div>
+        <div class="estado-texto" id="texto-estado">Cargando caja mediana...</div>
+
+        <!-- Premios obtenidos en vivo -->
+        <div class="seccion-premios">
+            <h3>📜 Botín Embrujado (8 Artículos)</h3>
+            <ul class="lista-premios" id="lista-inventario">
+                <li style="color: #64748b; border-color: #475569; justify-content: center;">Aún no hay premios...</li>
+            </ul>
+        </div>
+
+        <button class="btn-borrar" onclick="reiniciarProgresoLocalStorage()">🗑️ Reiniciar Caja Mediana</button>
+    </div>
+
+    <!-- MODAL DE RESUMEN FINAL / REINGRESO -->
+    <div id="modal-resumen" class="modal-overlay oculto">
+        <div class="modal-contenido">
+            <div style="font-size: 35px; margin-bottom: 2px;">🎃🏆🦇</div>
+            <h2 style="color: #f59e0b; font-size: 16px; margin-top: 0;" id="titulo-modal">¡Caja Ya Reclamada!</h2>
+            <p style="font-size: 11px; color: #cbd5e1; margin-bottom: 8px;" id="sub-modal">Ya abriste esta caja mediana. Aquí tienes tus 8 artículos asegurados:</p>
+            
+            <div class="seccion-premios" style="max-height: 160px; margin-bottom: 8px;">
+                <ul class="lista-premios" id="lista-modal-resumen">
+                    <!-- Se llena dinámicamente -->
+                </ul>
+            </div>
+
+            <button class="btn-accion" onclick="cerrarModalResumen()">¡Genial, Entendido! ✨</button>
+        </div>
+    </div>
+
+    <script>
+        // Lista completa de premios con sus probabilidades exactas
+        const premiosDisponibles = [
+            { nombre: "Huevo retro", prob: 30, icono: "🥚🦕" },
+            { nombre: "Huevo jubilado", prob: 20, icono: "🥚👴" },
+            { nombre: "Huevo básico", prob: 60, icono: "🥚📦" },
+            { nombre: "Huevo roto", prob: 50, icono: "🥚💔" },
+            { nombre: "Huevo mascota", prob: 30, icono: "🥚🐾" },
+            { nombre: "Huevo extinto", prob: 35, icono: "🥚🦖" },
+            { nombre: "Huevo hada", prob: 65, icono: "🥚🧚" },
+            { nombre: "Caja 2D", prob: 10, icono: "📦📐" },
+            { nombre: "Regalo pequeño", prob: 70, icono: "🎁🤏" },
+            { nombre: "Regalo mediano", prob: 40, icono: "🎁📦" },
+            { nombre: "Regalo grande", prob: 9, icono: "🎁👑" },
+            { nombre: "Poción bonus bucks", prob: 15, icono: "🧪💰" },
+            { nombre: "Poción XP bonus", prob: 15, icono: "🧪✨" },
+            { nombre: "Pet periquito bruja", prob: 40, icono: "🦜🧙‍♂️" },
+            { nombre: "Jerbo gelatinoso", prob: 20, icono: "🐁🟢" },
+            { nombre: "Conechoco", prob: 10, icono: "🍫🐰" },
+            { nombre: "Chocodrilo", prob: 10, icono: "🐊🍫" },
+            { nombre: "Iguana de gomita", prob: 20, icono: "🦎🍬" },
+            { nombre: "Caja de patitos", prob: 10, icono: "📦🦆" },
+            { nombre: "Caja de bellotas", prob: 5, icono: "📦🌰" },
+            { nombre: "Caja de conechocos", prob: 5, icono: "📦🍫" },
+            { nombre: "Huevo de cristal", prob: 2, icono: "🥚💎" }
+        ];
+
+        // Estado del juego para la caja mediana (8 premios)
+        let estadoCaja = {
+            cajaAbierta: false,      // false = cerrada con sello, true = abierta
+            premiosGanados: [],     // Array con los 8 premios obtenidos
+            toquesPremios: 0        // De 0 a 8 toques de premios realizados
+        };
+
+        // Cargar datos guardados previamente al iniciar la página
+        window.addEventListener('load', () => {
+            let datosGuardados = localStorage.getItem('caja_mediana_halloween_estado');
+            if (datosGuardados) {
+                estadoCaja = JSON.parse(datosGuardados);
+            }
+            actualizarInterfazGeneral();
+
+            // Si ya terminó los 8 premios y recarga/entra de nuevo, mostrar directamente el cartel
+            if (estadoCaja.toquesPremios >= 8) {
+                mostrarModalResumen(true);
+            }
+        });
+
+        function tocarCaja() {
+            // Si ya terminó los 8 premios, no hace nada al tocar la caja
+            if (estadoCaja.toquesPremios >= 8) return;
+
+            if (!estadoCaja.cajaAbierta) {
+                // PASO 0: Tocar para abrir la caja mediana (liberar cierre)
+                estadoCaja.cajaAbierta = true;
+                guardarEstado();
+                actualizarInterfazGeneral();
+                return;
+            }
+
+            if (estadoCaja.cajaAbierta && estadoCaja.toquesPremios < 8) {
+                // TOQUES 1 al 8: Entregar premio aleatorio
+                let nuevoPremio = sortearPremio();
+                estadoCaja.premiosGanados.push(nuevoPremio);
+                estadoCaja.toquesPremios++;
+                guardarEstado();
+
+                // Animación visual en la caja
+                let cajaEl = document.getElementById('caja-magica');
+                cajaEl.style.transform = "scale(1.15) rotate(6deg)";
+                setTimeout(() => { cajaEl.style.transform = "scale(1) rotate(0deg)"; }, 150);
+
+                actualizarInterfazGeneral();
+
+                if (estadoCaja.toquesPremios >= 8) {
+                    // Al completar el octavo premio, mostrar cartel de resumen final
+                    setTimeout(() => {
+                        mostrarModalResumen(false);
+                    }, 500);
+                }
+            }
+        }
+
+        function sortearPremio() {
+            let candidatosQuePasan = [];
+            premiosDisponibles.forEach(item => {
+                let tirada = Math.random() * 100;
+                if (tirada <= item.prob) {
+                    candidatosQuePasan.push(item);
+                }
+            });
+
+            if (candidatosQuePasan.length === 0) {
+                let randomIndex = Math.floor(Math.random() * premiosDisponibles.length);
+                return premiosDisponibles[randomIndex];
+            }
+
+            let finalIndex = Math.floor(Math.random() * candidatosQuePasan.length);
+            return candidatosQuePasan[finalIndex];
+        }
+
+        function actualizarInterfazGeneral() {
+            const cajaEl = document.getElementById('caja-magica');
+            const textoEstado = document.getElementById('texto-estado');
+            const listaInv = document.getElementById('lista-inventario');
+
+            // Actualizar diseño de la caja e indicador de texto
+            if (!estadoCaja.cajaAbierta) {
+                cajaEl.innerText = "📦";
+                cajaEl.classList.remove('bloqueada');
+                textoEstado.innerText = "🔒 ¡Toca la caja mediana para romper el sello mágico! ✨";
+            } else if (estadoCaja.toquesPremios < 8) {
+                cajaEl.innerText = "🎃🎁";
+                cajaEl.classList.remove('bloqueada');
+                textoEstado.innerText = `🎁 Toca la caja (${estadoCaja.toquesPremios}/8) para reclamar artículo.`;
+            } else {
+                cajaEl.innerText = "👻🕸️️";
+                cajaEl.classList.add('bloqueada');
+                textoEstado.innerText = "🎉 ¡Caja mediana vaciada! Los 8 artículos son tuyos.";
+            }
+
+            // Actualizar indicadores circulares de progreso (0 al 8)
+            let p0 = document.getElementById('p-0');
+            if (estadoCaja.cajaAbierta) {
+                p0.innerText = "✔";
+                p0.className = "punto-toque completado";
+            } else {
+                p0.innerText = "🔒";
+                p0.className = "punto-toque activo";
+            }
+
+            for (let i = 1; i <= 8; i++) {
+                let pEl = document.getElementById(`p-${i}`);
+                pEl.className = "punto-toque";
+                pEl.innerText = i;
+                if (i <= estadoCaja.toquesPremios) {
+                    pEl.className = "punto-toque completado";
+                    pEl.innerText = "✔";
+                } else if (estadoCaja.cajaAbierta && i === estadoCaja.toquesPremios + 1) {
+                    pEl.className = "punto-toque activo";
+                }
+            }
+
+            // Actualizar lista en vivo
+            listaInv.innerHTML = "";
+            if (estadoCaja.premiosGanados.length === 0) {
+                listaInv.innerHTML = `<li style="color: #64748b; border-color: #475569; justify-content: center;">Aún no hay premios...</li>`;
+            } else {
+                estadoCaja.premiosGanados.forEach((premio, idx) => {
+                    let li = document.createElement('li');
+                    li.innerHTML = `<span>${premio.icono}</span> <b>#${idx+1}:</b> ${premio.nombre}`;
+                    listaInv.appendChild(li);
+                });
+            }
+        }
+
+        function mostrarModalResumen(esReingreso) {
+            const modal = document.getElementById('modal-resumen');
+            const listaModal = document.getElementById('lista-modal-resumen');
+            const tituloModal = document.getElementById('titulo-modal');
+            const subModal = document.getElementById('sub-modal');
+
+            if (esReingreso) {
+                tituloModal.innerText = "🦇 ¡Bienvenido de nuevo!";
+                subModal.innerText = "Esta caja mediana ya fue abierta. Aquí están tus 8 artículos guardados:";
+            } else {
+                tituloModal.innerText = "🎉 ¡Caja Mediana Completada!";
+                subModal.innerText = "¡Has reclamado tus 8 artículos con éxito! Aquí está tu resumen:";
+            }
+
+            listaModal.innerHTML = "";
+            estadoCaja.premiosGanados.forEach((premio, idx) => {
+                let li = document.createElement('li');
+                li.innerHTML = `<span>${premio.icono}</span> <b>#${idx+1}:</b> ${premio.nombre}`;
+                listaModal.appendChild(li);
+            });
+
+            modal.classList.remove('oculto');
+        }
+
+        function cerrarModalResumen() {
+            document.getElementById('modal-resumen').classList.add('oculto');
+        }
+
+        function guardarEstado() {
+            localStorage.setItem('caja_mediana_halloween_estado', JSON.stringify(estadoCaja));
+        }
+
+        function reiniciarProgresoLocalStorage() {
+            if (confirm("¿Estás seguro de reiniciar la caja mediana por completo? Se borrarán tus 8 artículos actuales.")) {
+                localStorage.removeItem('caja_mediana_halloween_estado');
+                estadoCaja = {
+                    cajaAbierta: false,
+                    premiosGanados: [],
+                    toquesPremios: 0
+                };
+                actualizarInterfazGeneral();
+                alert("¡Caja mediana restablecida con éxito! Puedes volver a abrirla.");
+            }
+        }
+    </script>
+</body>
+  </html>
+  
